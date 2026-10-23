@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurnoPro | Reserva tu cita</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f2ff;
+      color: #25213b;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    header {
+      text-align: center;
+      padding: 25px 10px;
+    }
+
+    header h1 {
+      color: #6c45d9;
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: #686477;
+      line-height: 1.5;
+    }
+
+    .contenedor {
+      max-width: 520px;
+      margin: 10px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(42, 29, 91, 0.10);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 23px;
+    }
+
+    .descripcion {
+      color: #686477;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 17px 0 8px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d8d4e8;
+      border-radius: 9px;
+      font-size: 15px;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid #9b83f1;
+      border-color: #6c45d9;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      border: none;
+      border-radius: 9px;
+      background: #6c45d9;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5030b3;
+    }
+
+    #resultado {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 9px;
+      background: #e8f8ee;
+      color: #176638;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    footer {
+      text-align: center;
+      color: #777187;
+      font-size: 13px;
+      margin: 25px 0 10px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+
+      .contenedor {
+        padding: 22px;
+      }
+
+      header h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>TurnoPro</h1>
+    <p>Tu tiempo importa. Reserva tu cita de forma sencilla.</p>
+  </header>
+
+  <main class="contenedor">
+    <h2>Reserva tu cita</h2>
+    <p class="descripcion">
+      Completa los datos y solicita el horario que prefieras.
+    </p>
+
+    <form id="formulario">
+      <label for="nombre">Nombre completo</label>
+      <input
+        type="text"
+        id="nombre"
+        placeholder="Escribe tu nombre"
+        autocomplete="name"
+        required
+      >
+
+      <label for="servicio">Selecciona un servicio</label>
+      <select id="servicio" required>
+        <option value="">Elige un servicio</option>
+        <option value="Corte de cabello">Corte de cabello</option>
+        <option value="Manicura">Manicura</option>
+        <option value="Consulta">Consulta</option>
+        <option value="Otro servicio">Otro servicio</option>
+      </select>
+
+      <label for="fecha">Fecha de la cita</label>
+      <input type="date" id="fecha" required>
+
+      <label for="hora">Hora preferida</label>
+      <select id="hora" required>
+        <option value="">Selecciona una hora</option>
+        <option value="09:00">9:00 a. m.</option>
+        <option value="10:00">10:00 a. m.</option>
+        <option value="11:00">11:00 a. m.</option>
+        <option value="12:00">12:00 p. m.</option>
+        <option value="14:00">2:00 p. m.</option>
+        <option value="15:00">3:00 p. m.</option>
+        <option value="16:00">4:00 p. m.</option>
+      </select>
+
+      <button type="submit">Solicitar cita</button>
+    </form>
+
+    <div id="resultado" role="status" aria-live="polite"></div>
+  </main>
+
+  <footer>
+    Proyecto académico de Interacción Humano Computador
+  </footer>
+
+  <script>
+    const formulario = document.getElementById("formulario");
+    const campoFecha = document.getElementById("fecha");
+    const resultado = document.getElementById("resultado");
+
+    // Evitar que se seleccione una fecha anterior a hoy.
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoy.getDate()).padStart(2, "0");
+
+    campoFecha.min = `${anio}-${mes}-${dia}`;
+
+    formulario.addEventListener("submit", function(evento) {
+      evento.preventDefault();
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const servicio = document.getElementById("servicio").value;
+      const fecha = campoFecha.value;
+      const hora = document.getElementById("hora").value;
+
+      if (!nombre || !servicio || !fecha || !hora) {
+        alert("Por favor, completa todos los campos.");
+        return;
+      }
+
+      if (fecha < campoFecha.min) {
+        alert("Selecciona una fecha válida.");
+        return;
+      }
+
+      const fechaFormato = fecha.split("-").reverse().join("/");
+
+      resultado.replaceChildren();
+
+      const titulo = document.createElement("strong");
+      titulo.textContent = "¡Solicitud realizada correctamente!";
+
+      const detalle = document.createElement("p");
+      detalle.textContent =
+        `Nombre: ${nombre} | Servicio: ${servicio} | Fecha: ${fechaFormato} | Hora: ${hora}`;
+
+      resultado.append(titulo, detalle);
+      resultado.style.display = "block";
+      formulario.reset();
+      campoFecha.min = `${anio}-${mes}-${dia}`;
+    });
+  </script>
+</body>
+</html>
